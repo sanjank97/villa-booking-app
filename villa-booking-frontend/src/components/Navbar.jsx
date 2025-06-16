@@ -1,31 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { useContext } from 'react'
+import { AuthContext } from '../context/AuthContext'
 import '../assets/css/Navbar.css'
-import { jwtDecode } from 'jwt-decode'
-
-import { useEffect, useState } from 'react'
 
 export default function Navbar() {
-  const [user, setUser] = useState(null)
+  const { user, logout } = useContext(AuthContext)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-
-    if (token) {
-      try {
-        const decoded = jwtDecode(token)
-        setUser(decoded)
-      } catch (err) {
-        console.error('Invalid token:', err)
-        localStorage.removeItem('token')
-        setUser(null)
-      }
-    }
-  }, [])
-
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    setUser(null)
+    logout()
     navigate('/')
   }
 
@@ -38,7 +21,6 @@ export default function Navbar() {
         <li><Link to="/">Home</Link></li>
         <li><Link to="/villas">All Villas</Link></li>
 
-        {/* Role-based Dashboard */}
         {user?.role === 'admin' && (
           <li><Link to="/admin/dashboard">Admin Dashboard</Link></li>
         )}
@@ -47,7 +29,6 @@ export default function Navbar() {
           <li><Link to="/myaccount">My Account</Link></li>
         )}
 
-        {/* Show Register/Login if NOT logged in */}
         {!user && (
           <>
             <li><Link to="/register">Register</Link></li>
@@ -55,18 +36,9 @@ export default function Navbar() {
           </>
         )}
 
-        {/* Show Logout if logged in */}
         {user && (
           <li>
-            <button
-              onClick={handleLogout}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'red',
-                cursor: 'pointer'
-              }}
-            >
+            <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer' }}>
               Logout
             </button>
           </li>
