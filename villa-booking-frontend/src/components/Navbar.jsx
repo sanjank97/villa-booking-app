@@ -26,6 +26,9 @@ export default function Navbar() {
               <li>
                 <Link to="/villas" className="hover:text-blue-600 transition duration-200">All Villas</Link>
               </li>
+               <li>
+                 <Link to="/wishlist" className="hover:text-blue-600 transition duration-200">Wishlist</Link>
+               </li>
 
               {user?.role === 'admin' && (
                 <li>
@@ -45,7 +48,7 @@ export default function Navbar() {
                     <Link to="/register" className="hover:text-blue-600 transition duration-200">Register</Link>
                   </li>
                   <li>
-                    <Link to="/login" className="hover:text-blue-600 transition duration-200">Login</Link>
+                    <Link to="/login" className="hover:text-blue-600 transition duration-200">Sign In</Link>
                   </li>
                 </>
               )}

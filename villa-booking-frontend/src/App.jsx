@@ -16,6 +16,8 @@ import Navbar from './components/Navbar'
 import Myaccount from './pages/Myaccount'
 import BookingForm from './pages/BookingForm'
 import ThankYou from './pages/ThankYou'
+import Wishlist from './pages/Wishlist'
+
 
 export default function App() {
   return (
@@ -30,6 +32,7 @@ export default function App() {
         <Route path="/myaccount" element={<Myaccount />} /> 
         <Route path="/booking-form" element={<BookingForm />} />
         <Route path="/thank-you" element={<ThankYou />} />
+         <Route path="/wishlist" element={<Wishlist />} />
         
         <Route path="/admin/dashboard" element={<AdminDashborad />}>
           <Route index element={<DashboardHome />} />

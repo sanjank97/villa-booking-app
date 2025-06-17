@@ -31,24 +31,24 @@ export default function BookingForm() {
   }, [villa])
 
 
- const handleSubmit = async (e) => {
-  e.preventDefault()
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
   if (!startDate || !endDate) {
-    toast.error('Please select both dates')
-    return
+    toast.error('Please select both dates');
+    return;
   }
 
-  const token = localStorage.getItem('token')
-
+  const token = localStorage.getItem('token');
   if (!token) {
-    toast.error('You must be logged in to book a villa')
-    navigate('/login') // 👈 Redirect to login page
-    return
+    toast.error('You must be logged in to book a villa');
+    navigate('/login');
+    return;
   }
 
   try {
-    const res = await axios.post(
+    // 1. Create booking with pending status
+    const bookingRes = await axios.post(
       'http://localhost:5000/api/bookings/',
       {
         villa_id: villa.id,
@@ -58,29 +58,81 @@ export default function BookingForm() {
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
       }
-    )
+    );
 
-    if (res.status === 201) {
-      toast.success(`✅ ${res.data.message}`, { duration: 2500 })
-      setTimeout(() => navigate('/thank-you'), 2000)
-    }
+
+    const amount = villa.price_per_night * (Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
+
+    // 2. Create Razorpay order
+    const paymentRes = await axios.post(
+      'http://localhost:5000/api/payment/create-order',
+      {
+        amount,
+        booking_id:  bookingRes.data.bookingId,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    const { id: order_id, amount: razorAmount, currency } = paymentRes.data;
+
+
+    console.log("paymentRes", paymentRes);
+
+    // 3. Load Razorpay checkout
+    const options = {
+      key: 'rzp_test_iyo2xuccNd7DP7', // ✅ Replace with your Razorpay test key
+      amount: razorAmount,
+      currency,
+      name: villa.name,
+      description: 'Villa Booking Payment',
+      order_id,
+      handler: async function (response) {
+        // 4. Verify payment on server
+        const verifyRes = await axios.post(
+          'http://localhost:5000/api/payment/verify',
+          {
+            booking_id: bookingRes.data.bookingId,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            amount,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        toast.success('🎉 Payment successful!');
+        navigate('/thank-you');
+      },
+      prefill: {
+        name: 'Test User',
+        email: 'test@example.com',
+        contact: '9999999999',
+      },
+      theme: {
+        color: '#3399cc',
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   } catch (error) {
-    if (error.response?.status === 409) {
-      toast.error('❌ Booking conflict: ' + error.response.data.message)
-    } else {
-      toast.error('❌ Error: ' + (error.response?.data?.message || 'Something went wrong'))
-    }
+    console.error(error);
+    toast.error('❌ Something went wrong!');
   }
-}
+};
+
 
 
   if (!villa) return <p className="p-4 text-red-500">No villa selected</p>
 
   return (
-    <div className="p-6 max-w-xl mx-auto bg-white rounded shadow">
+    <div className="p-6 mt-8 max-w-xl mx-auto bg-white rounded shadow">
       <Toaster />
       <h2 className="text-2xl font-bold mb-4">Booking for {villa.name}</h2>
       <p className="mb-2">Location: {villa.location}</p>
