@@ -121,9 +121,8 @@ export function BookingList() {
           >
             <option value="">All Statuses</option>
             <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="completed">Completed</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
           </select>
         </div>
         
@@ -143,7 +142,7 @@ export function BookingList() {
         
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Check In</label>
             <DatePicker
               selected={startDateFilter}
               onChange={date => setStartDateFilter(date)}
@@ -155,7 +154,7 @@ export function BookingList() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Check Out</label>
             <DatePicker
               selected={endDateFilter}
               onChange={date => setEndDateFilter(date)}
@@ -188,35 +187,44 @@ export function BookingList() {
                   <th className="px-4 py-3 border">Email</th>
                   <th className="px-4 py-3 border">Villa</th>
                   <th className="px-4 py-3 border">Location</th>
-                  <th className="px-4 py-3 border">Start Date</th>
-                  <th className="px-4 py-3 border">End Date</th>
+                  <th className="px-4 py-3 border">Check In</th>
+                  <th className="px-4 py-3 border">Check Out</th>
                   <th className="px-4 py-3 border">Status</th>
                 </tr>
               </thead>
-              <tbody>
-                {currentBookings.map((booking) => (
-                  <tr key={booking.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 border">{booking.id}</td>
-                    <td className="px-4 py-3 border">{booking.user_name}</td>
-                    <td className="px-4 py-3 border">{booking.email}</td>
-                    <td className="px-4 py-3 border">{booking.villa_name}</td>
-                    <td className="px-4 py-3 border">{booking.location}</td>
-                    <td className="px-4 py-3 border">{new Date(booking.start_date).toLocaleDateString()}</td>
-                    <td className="px-4 py-3 border">{new Date(booking.end_date).toLocaleDateString()}</td>
-                    <td className="px-4 py-3 border">
-                      <span className={`px-2 py-1 rounded text-white text-xs font-medium ${
-                        booking.status === 'confirmed'
+           <tbody>
+              {currentBookings.map((booking) => (
+                <tr key={booking.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 border text-center">{booking.id}</td>
+                  <td className="px-4 py-3 border">{booking.user_name}</td>
+                  <td className="px-4 py-3 border">{booking.email}</td>
+                  <td className="px-4 py-3 border">{booking.villa_name}</td>
+                  <td className="px-4 py-3 border">{booking.location}</td>
+                  <td className="px-4 py-3 border text-center">
+                    {new Date(booking.start_date).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3 border text-center">
+                    {new Date(booking.end_date).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3 border text-center">
+                    <span
+                      className={`px-2 py-1 rounded-full text-white text-xs font-medium ${
+                        booking.status === 'approved'
                           ? 'bg-green-600'
                           : booking.status === 'pending'
                           ? 'bg-yellow-500'
-                          : 'bg-red-600'
-                      }`}>
-                        {booking.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                          : booking.status === 'rejected'
+                          ? 'bg-red-600'
+                          : 'bg-gray-400'
+                      }`}
+                    >
+                      {booking.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+
             </table>
           </div>
 

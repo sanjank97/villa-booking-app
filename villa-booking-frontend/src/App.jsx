@@ -31,7 +31,7 @@ export default function App() {
         <Route path="/villas" element={<Villa />} /> 
         <Route path="/myaccount" element={<Myaccount />} /> 
         <Route path="/booking-form" element={<BookingForm />} />
-        <Route path="/thank-you" element={<ThankYou />} />
+        <Route path="/thank-you/:bookingId" element={<ThankYou />} />
          <Route path="/wishlist" element={<Wishlist />} />
         
         <Route path="/admin/dashboard" element={<AdminDashborad />}>

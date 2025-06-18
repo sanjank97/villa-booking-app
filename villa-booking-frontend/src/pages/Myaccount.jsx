@@ -54,16 +54,17 @@ export default function Myaccount() {
             <strong>Location:</strong> {booking.location}
           </p>
           <p className="text-gray-700">
-            <strong>Start Date:</strong>{' '}
+            <strong>Check In:</strong>{' '}
             {new Date(booking.start_date).toLocaleDateString()}
           </p>
           <p className="text-gray-700">
-            <strong>End Date:</strong>{' '}
+            <strong>Check Out:</strong>{' '}
             {new Date(booking.end_date).toLocaleDateString()}
           </p>
           <p className="text-gray-700">
             <strong>Status:</strong> {booking.status}
           </p>
+          <p><strong>Booked On:</strong> {new Date(booking.created_at).toLocaleString()}</p>
         </li>
       ))}
     </ul>

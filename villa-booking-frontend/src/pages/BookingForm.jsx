@@ -64,13 +64,14 @@ const handleSubmit = async (e) => {
 
 
     const amount = villa.price_per_night * (Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
+    const bookingId = bookingRes.data.bookingId;
 
     // 2. Create Razorpay order
     const paymentRes = await axios.post(
       'http://localhost:5000/api/payment/create-order',
       {
         amount,
-        booking_id:  bookingRes.data.bookingId,
+        booking_id:  bookingId,
       },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -82,6 +83,7 @@ const handleSubmit = async (e) => {
 
     console.log("paymentRes", paymentRes);
 
+
     // 3. Load Razorpay checkout
     const options = {
       key: 'rzp_test_iyo2xuccNd7DP7', // ✅ Replace with your Razorpay test key
@@ -91,15 +93,18 @@ const handleSubmit = async (e) => {
       description: 'Villa Booking Payment',
       order_id,
       handler: async function (response) {
+
+        console.log("verify response", response );
+
+        console.log("bookingId..", bookingId);
         // 4. Verify payment on server
         const verifyRes = await axios.post(
           'http://localhost:5000/api/payment/verify',
           {
-            booking_id: bookingRes.data.bookingId,
+            booking_id: bookingId,
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
-            amount,
           },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -107,7 +112,7 @@ const handleSubmit = async (e) => {
         );
 
         toast.success('🎉 Payment successful!');
-        navigate('/thank-you');
+        navigate(`/thank-you/${bookingId}`);
       },
       prefill: {
         name: 'Test User',
@@ -140,7 +145,7 @@ const handleSubmit = async (e) => {
 
       <form onSubmit={handleSubmit} className="space-y-4 mt-4">
         <div>
-          <label className="block mb-1 font-medium">Start Date</label>
+          <label className="block mb-1 font-medium">Check In</label>
           <DatePicker
             selected={startDate}
             onChange={(date) => setStartDate(date)}
@@ -152,7 +157,7 @@ const handleSubmit = async (e) => {
           />
         </div>
         <div>
-          <label className="block mb-1 font-medium">End Date</label>
+          <label className="block mb-1 font-medium">Check Out</label>
           <DatePicker
             selected={endDate}
             onChange={(date) => setEndDate(date)}

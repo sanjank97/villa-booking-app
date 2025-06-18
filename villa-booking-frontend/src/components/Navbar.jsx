@@ -33,10 +33,10 @@ export default function Navbar() {
               {user?.role === 'admin' && (
                 <li>
                   <Link to="/admin/dashboard" className="hover:text-blue-600 transition duration-200">Admin Dashboard</Link>
-                </li>
+                </li>    
               )}
 
-              {user?.role === 'user' && (
+              {(user?.role === 'admin' || user?.role === 'user') && (
                 <li>
                   <Link to="/myaccount" className="hover:text-blue-600 transition duration-200">My Account</Link>
                 </li>
